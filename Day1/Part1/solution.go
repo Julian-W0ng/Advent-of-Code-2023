@@ -20,39 +20,34 @@ func main() {
 	var sum int = 0
 	// array of digits as characters
 	charDigits := [10]byte{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'}
-	// constant array of digits as words
 
 	for _, line := range lines {
 		firstDigit := -1
 		lastDigit := -1
 
-		found := false
-
 		// get the first digit of the line
-		for i := 0; i < len(line) && !found; i++ {
+		for i := 0; i < len(line); i++ {
 			for j, d := range charDigits {
 				if d == line[i] {
 					firstDigit = j
-					// firstDigitIndex = i
-					found = true
-					break
+					goto foundFirst
 				}
 			}
 		}
 
-		found = false
+	foundFirst:
 
 		// get the last digit of the line
-		for i := len(line) - 1; i >= 0 && !found; i-- {
+		for i := len(line) - 1; i >= 0; i-- {
 			for j, d := range charDigits {
 				if d == line[i] {
 					lastDigit = j
-					// firstDigitIndex = i
-					found = true
-					break
+					goto foundLast
 				}
 			}
 		}
+
+	foundLast:
 
 		sum += firstDigit*10 + lastDigit
 
