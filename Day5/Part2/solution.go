@@ -6,11 +6,14 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"sync"
 )
 
 const STARTOFDESTINATION int = 0
 const STARTOFSOURCE int = 1
 const RANGE int = 2
+
+var wg = sync.WaitGroup{}
 
 func main() {
 	input, err := os.ReadFile("input.txt")
@@ -50,22 +53,35 @@ func main() {
 	}
 
 	min := math.MaxInt64
-	for _, seed := range seeds {
-		translation := seed
+	translations := make([]int, len(seeds))
+	for i, seed := range seeds {
+		wg.Add(1)
+		go translate(seed, &sectionsArray, &translations[i])
+	}
+	wg.Wait()
 
-		for _, section := range sectionsArray {
-			for _, line := range section {
-				if translation >= line[STARTOFSOURCE] && translation < line[STARTOFSOURCE]+line[RANGE] {
-					translation = line[STARTOFDESTINATION] + (translation - line[STARTOFSOURCE])
-					break
-				}
-			}
-		}
-
+	for _, translation := range translations {
 		if translation < min {
 			min = translation
 		}
 	}
 
 	fmt.Println(min)
+}
+
+func translate(seed int, sectionsArray *[][][3]int, output *int) {
+	translation := seed
+
+	for _, section := range *sectionsArray {
+		for _, line := range section {
+			if translation >= line[STARTOFSOURCE] && translation < line[STARTOFSOURCE]+line[RANGE] {
+				translation = line[STARTOFDESTINATION] + (translation - line[STARTOFSOURCE])
+				break
+			}
+		}
+	}
+
+	*output = translation
+
+	wg.Done()
 }
