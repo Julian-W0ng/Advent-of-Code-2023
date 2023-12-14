@@ -20,6 +20,16 @@ func isAtEnd(currentNodes *[]string) bool {
 	return true
 }
 
+func lcm(a, b int) int {
+	var gcd int = 1
+	for i := 1; i <= a && i <= b; i++ {
+		if a%i == 0 && b%i == 0 {
+			gcd = i
+		}
+	}
+	return a * b / gcd
+}
+
 func main() {
 	input, err := os.ReadFile("input.txt")
 	if err != nil {
@@ -47,21 +57,27 @@ func main() {
 		}
 	}
 
-	var numberOfSteps int
-	var length int = len(directions)
+	var numberOfIterations []int = make([]int, len(currentNodes))
+	var lengthOfDirections int = len(directions)
 
-	for numberOfSteps = 0; !isAtEnd(&currentNodes); numberOfSteps++ {
-		var directionIndex int = numberOfSteps % length
-		if directions[directionIndex] == 'L' {
-			for i, node := range currentNodes {
-				currentNodes[i] = nodeMap[node].left
-			}
-		} else {
-			for i, node := range currentNodes {
-				currentNodes[i] = nodeMap[node].right
+	for i := range currentNodes {
+		for numberOfIterations[i] = 0; currentNodes[i][2] != 'Z'; numberOfIterations[i]++ {
+			for j := 0; j < lengthOfDirections; j++ {
+				if directions[j] == 'L' {
+					currentNodes[i] = nodeMap[currentNodes[i]].left
+				} else {
+					currentNodes[i] = nodeMap[currentNodes[i]].right
+				}
 			}
 		}
 	}
+
+	// Find lcm of all numbers in numberOfIterations
+	var numberOfSteps int = numberOfIterations[0]
+	for i := 1; i < len(numberOfIterations); i++ {
+		numberOfSteps = lcm(numberOfSteps, numberOfIterations[i])
+	}
+	numberOfSteps *= lengthOfDirections
 
 	fmt.Println(numberOfSteps)
 }
